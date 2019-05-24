@@ -53,8 +53,12 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 	@echo ""
 
-
 clean-pip:
 	@echo "--> Cleaning pip wheel"
 	rm -rf pip-wheel-metadata/
+	@echo ""
+
+clean-migrations:
+	@echo "--> Cleaning migrations"
+	rm -rf migrations/
 	@echo ""

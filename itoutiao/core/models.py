@@ -1,8 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
-from itoutiao.corelib.utils import is_numeric
-from itoutiao.models import BaseModel
+from basemodel import BaseModel
+from corelib.utils import is_numeric
 
 
 class Post(BaseModel):
@@ -13,6 +13,7 @@ class Post(BaseModel):
     content = models.TextField()
 
     class Meta:
+        db_table = "posts"
         verbose_name = verbose_name_plural = "文章"
         ordering = ("-id",)
 
@@ -28,18 +29,28 @@ class Post(BaseModel):
         if post:
             return post
         if is_numeric(identifier):
-            return cls.objects.get(identifier).first()
+            return cls.objects.get(pk=identifier)
 
     @property
     def tags(self):
-        at_ids = PostTag.objects.filter(PostTag.post_id == self.id).values_list("id")
-        tags = Tag.objects.filter(Tag.id__in(id for id in at_ids))
+        at_ids = PostTag.objects.filter(post_id=self.id).values_list("id")
+        tags = Tag.objects.filter(id__in=(id for id in at_ids)).values_list("name")
+        return tags
+
+    @classmethod
+    def update_or_create(cls, **kwargs):
+        tags = kwargs.pop("tags", [])
+        obj, created = cls.objects.update_or_create(**kwargs)
+        if tags:
+            PostTag.update_multi(obj.id, tags)
+        return obj, created
 
 
 class Tag(BaseModel):
     name = models.CharField(max_length=128, default="", db_index=True)
 
     class Meta:
+        db_table = "tags"
         verbose_name = verbose_name_plural = "标签"
         ordering = ("-id",)
 
@@ -56,8 +67,34 @@ class PostTag(BaseModel):
     tag_id = models.IntegerField()
 
     class Meta:
+        db_table = "post_tags"
         verbose_name = verbose_name_plural = "文章-标签"
         ordering = ("-id",)
 
     def __str__(self):
         return self.post_id, self.tag_id
+
+    @classmethod
+    def update_multi(cls, post_id, tags):
+        origin_tags = Post.get(post_id).tags
+        need_add = set()
+        need_del = set()
+        for tag in tags:
+            if tag not in origin_tags:
+                need_add.add(tag)
+        for tag in origin_tags:
+            if tag not in tags:
+                need_del.add(tag)
+        need_add_tag_ids = set()
+        need_del_tag_ids = set()
+        for tag_name in need_add:
+            tag = Tag.objects.create(name=tag_name)
+            need_add_tag_ids.add(tag.id)
+        for tag_name in need_del:
+            tag = Tag.objects.get(name=tag_name)
+            need_del_tag_ids.add(tag.id)
+
+        if need_del_tag_ids:
+            cls.objects.filter(post_id=post_id, tag_id__in=need_del_tag_ids).delete()
+        for tag_id in need_add_tag_ids:
+            cls.objects.create(post_id=post_id, tag_id=tag_id)

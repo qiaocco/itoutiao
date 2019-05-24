@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from itoutiao.models import BaseModel
+from itoutiao.basemodel import BaseModel
 
 
 class UserProfile(AbstractUser, BaseModel):
@@ -29,6 +29,7 @@ class UserProfile(AbstractUser, BaseModel):
     roles = models.ForeignKey("Role", related_name="users", on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "users"
         verbose_name = verbose_name_plural = "用户"
 
     def __str__(self):
