@@ -1,14 +1,14 @@
 from django.db import models
-from apps.models import BaseModel
-
 from django.urls import reverse
+
 from apps.corelib.utils import is_numeric
+from apps.models import BaseModel
 
 
 class Post(BaseModel):
     author_id = models.IntegerField()
-    title = models.CharField(max_length=128, default='', db_index=True)
-    orig_url = models.URLField(max_length=255, default='')
+    title = models.CharField(max_length=128, default="", db_index=True)
+    orig_url = models.URLField(max_length=255, default="")
     can_comment = models.BooleanField(default=True)
     content = models.TextField()
 
@@ -32,7 +32,7 @@ class Post(BaseModel):
 
     @property
     def tags(self):
-        at_ids = PostTag.objects.filter(PostTag.post_id == self.id).values_list('id')
+        at_ids = PostTag.objects.filter(PostTag.post_id == self.id).values_list("id")
         tags = Tag.objects.filter(Tag.id__in(id for id in at_ids))
 
 
