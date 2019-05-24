@@ -6,7 +6,7 @@ import sys
 
 def main():
     profile = os.environ.get("ITOUTIAO_PROFILE", "develop")
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"itoutiao.settings.{profile}")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{profile}")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -59,7 +59,6 @@ docs/_build/
 target/
 
 # my
-config
 .idea/
 .envrc
 pip-wheel-metadata/

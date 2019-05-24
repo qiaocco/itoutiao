@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from apps.models import BaseModel
+from itoutiao.models import BaseModel
 
 
 class UserProfile(AbstractUser, BaseModel):

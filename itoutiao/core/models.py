@@ -1,8 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
-from apps.corelib.utils import is_numeric
-from apps.models import BaseModel
+from itoutiao.corelib.utils import is_numeric
+from itoutiao.models import BaseModel
 
 
 class Post(BaseModel):
