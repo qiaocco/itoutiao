@@ -1,0 +1,8 @@
+-r requirements.txt
+
+black
+isort
+pre-commit
+ipython
+mycli
+pytest
