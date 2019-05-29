@@ -11,6 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+profile = os.environ.get("ITOUTIAO_PROFILE", "develop")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{profile}")
 
 application = get_wsgi_application()
