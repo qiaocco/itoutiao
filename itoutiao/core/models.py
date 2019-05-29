@@ -1,8 +1,9 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from basemodel import BaseModel
-from corelib.utils import is_numeric
+from corelib.utils import is_numeric, trunc_utf8
 
 
 class Post(BaseModel):
@@ -23,6 +24,10 @@ class Post(BaseModel):
     def get_absolute_url(self):
         return reverse("post_detail", args=(self.slug,))
 
+    @cached_property
+    def abstract_content(self):
+        return trunc_utf8(self.content, 100)
+
     @classmethod
     def get(cls, identifier):
         post = cls.objects.filter(title=identifier).first()
@@ -31,10 +36,14 @@ class Post(BaseModel):
         if is_numeric(identifier):
             return cls.objects.get(pk=identifier)
 
-    @property
+    @cached_property
     def tags(self):
-        at_ids = PostTag.objects.filter(post_id=self.id).values_list("id")
-        tags = Tag.objects.filter(id__in=(id for id in at_ids)).values_list("name")
+        tag_ids = PostTag.objects.filter(post_id=self.id).values_list(
+            "tag_id", flat=True
+        )
+        tags = Tag.objects.filter(id__in=(id for id in tag_ids)).values_list(
+            "name", flat=True
+        )
         return tags
 
     @classmethod
