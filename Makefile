@@ -60,5 +60,6 @@ clean-pip:
 
 clean-migrations:
 	@echo "--> Cleaning migrations"
-	rm -rf migrations/
+	find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+	find . -path "*/migrations/*.pyc"  -delete
 	@echo ""
